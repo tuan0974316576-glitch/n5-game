@@ -633,7 +633,16 @@ html, body {
     outline: none;
     min-width: 220px; /* 固定最少闊度，唔會郁黎郁去 */
 }
-
+.mic-btn:disabled {
+    opacity: 0.4;           /* 變半透明 */
+    cursor: wait;           /* 滑鼠變沙漏/等待圖示 */
+    transform: none;        /* 移除浮動效果 */
+    box-shadow: none;       /* 移除陰影 */
+    background-color: #eee; /* 變灰色 */
+    border-color: #ccc;     /* 邊框變灰 */
+    color: #999;            /* 字體變灰 */
+    pointer-events: none;   /* 禁止點擊 (雙重保險) */
+}
 /* 滑鼠指住時 */
 .mic-btn:hover {
     background-color: #e0fbfc;
@@ -3573,7 +3582,7 @@ const vocabList = [
                         <div style="margin:8px 0; font-size:18px;">${q.example}</div>
 
                         <div id="sentence-mic-area" style="margin-top:10px; border-top:1px dashed #ccc; padding-top:10px; text-align:center;">
-                            <button id="mic-btn" class="mic-btn" onclick="toggleMic()" style="margin:0 auto;">
+                            <button id="mic-btn" class="mic-btn" onclick="toggleMic()" style="margin:0 auto;" disabled>
                                 <span>🎤</span> <span id="mic-status">跟讀這句 (評分)</span>
                             </button>
                             <div id="mic-feedback" class="mic-result" style="margin-top:5px;"></div>
@@ -3596,7 +3605,24 @@ const vocabList = [
                 </div>
             `;
 
-            if (cleanJpText) setTimeout(() => { speakJapanese(cleanJpText); }, 600); 
+   if (cleanJpText) {
+    setTimeout(() => { 
+        speakJapanese(cleanJpText, function() {
+            // 這是一個 callback，當語音讀完後會執行這裡
+            const btn = document.getElementById('mic-btn');
+            if (btn) {
+                btn.disabled = false; // 解鎖按鈕
+                // 這裡可以選擇性加入一個小動畫或提示，例如：
+                // btn.style.transform = "scale(1.1)";
+                // setTimeout(() => btn.style.transform = "scale(1)", 200);
+            }
+        }); 
+    }, 600);
+} else {
+    // 如果沒有例句要讀，直接解鎖按鈕 (防止極端情況)
+    const btn = document.getElementById('mic-btn');
+    if (btn) btn.disabled = false;
+}
 
         } catch (err) {
             console.error("Feedback Error:", err);
@@ -3721,17 +3747,42 @@ const vocabList = [
         return jpSpan ? jpSpan.textContent : tempDiv.textContent;
     }
 
-    function speakJapanese(text) {
-        if (!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ja-JP'; 
-        utterance.rate = 0.9;
-        const voices = window.speechSynthesis.getVoices();
-        const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
-        if(jpVoice) utterance.voice = jpVoice;
-        window.speechSynthesis.speak(utterance);
+// 修改後的 speakJapanese，增加了 onEndCallback 參數
+function speakJapanese(text, onEndCallback = null) {
+    if (!window.speechSynthesis) {
+        // 如果瀏覽器不支持，直接執行 callback (避免按鈕永遠卡死)
+        if (onEndCallback) onEndCallback();
+        return;
     }
+
+    // 取消之前的發音
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ja-JP'; 
+    utterance.rate = 0.9;
+
+    // 取得日語聲音
+    const voices = window.speechSynthesis.getVoices();
+    const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
+    if(jpVoice) utterance.voice = jpVoice;
+
+    // 👇 關鍵修改：當讀完時，執行傳進來的指令
+    utterance.onend = function() {
+        if (onEndCallback) {
+            onEndCallback();
+        }
+    };
+
+    // 萬一出錯，也要執行 callback，避免按鈕卡死
+    utterance.onerror = function() {
+        if (onEndCallback) {
+            onEndCallback();
+        }
+    };
+
+    window.speechSynthesis.speak(utterance);
+}
 
     function similarity(s1, s2) {
         let longer = s1; let shorter = s2;
