@@ -596,71 +596,93 @@ html, body {
             border-left: 3px solid var(--secondary-color);
             line-height: 1.4;
         }
-/* ========================================= */
-/* 👇👇👇 請將這段貼在 <style> 的最後面 👇👇👇 */
-/* ========================================= */
 
-/* 1. 呼吸燈動畫 (Breathing Animation) */
-@keyframes pulse-red {
+@keyframes pulse-white {
     0% {
-        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6);
         transform: scale(1);
     }
     50% {
-        transform: scale(1.05); /* 輕微放大 */
+        transform: scale(1.05);
     }
     70% {
-        box-shadow: 0 0 0 15px rgba(255, 107, 107, 0); /* 發光擴散 */
+        box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); /* 白光向外散開 */
     }
     100% {
-        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
         transform: scale(1);
     }
 }
 
-/* 2. 錄音按鈕「聆聽中」狀態 */
+/* 2. 按鈕基本形態 (日系粗框虛線) */
+.mic-btn {
+    background-color: #ffffff;
+    border: 3px dashed #0a9396; /* 粗虛線邊框 (主色) */
+    border-radius: 50px;        /* 超圓潤 */
+    padding: 12px 35px;         /* 加大按鈕，手指好撳啲 */
+    font-size: 18px;            /* 字體加大 */
+    font-weight: 800;           /* 粗體字 */
+    color: #0a9396;             /* 字色同邊框一樣 */
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* 彈性動畫 */
+    box-shadow: 0 5px 15px rgba(10, 147, 150, 0.15); /* 輕微陰影令佢浮起 */
+    outline: none;
+    min-width: 220px; /* 固定最少闊度，唔會郁黎郁去 */
+}
+
+/* 滑鼠指住時 */
+.mic-btn:hover {
+    background-color: #e0fbfc;
+    transform: translateY(-3px); /* 輕微升起 */
+    box-shadow: 0 8px 20px rgba(10, 147, 150, 0.25);
+}
+
+/* 3. 錄音中狀態 (變身！) */
 .mic-btn.listening {
-    background-color: #ffe3e3 !important;
-    border-color: #ff6b6b !important;
-    color: #c92a2a !important;
-    font-weight: bold;
-    /* 這裡啟動動畫 👇 */
-    animation: pulse-red 1.5s infinite; 
-    box-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+    background-color: #ff8fa3 !important; /* 轉成可愛粉紅色 */
+    border: 3px solid #ffffff !important; /* 邊框變實心白線 */
+    color: #ffffff !important;            /* 字變白 */
+    
+    /* 啟動白光呼吸燈 👇 */
+    animation: pulse-white 1.5s infinite; 
+    box-shadow: 0 0 20px rgba(255, 143, 163, 0.6); /* 粉紅光暈 */
 }
 
-/* 3. 評分結果：紅/綠字樣式 */
+/* 4. 評分結果字體 (保持清晰) */
+.mic-result {
+    margin-top: 15px;
+    min-height: 30px;
+}
 .diff-char {
-    font-weight: bold;
-    font-size: 20px; /* 字體加大，看得更清楚 */
-    margin: 0 1px;
-    padding: 2px;
-    border-radius: 4px;
+    font-weight: 900;
+    font-size: 22px; /* 再大粒啲 */
+    margin: 0 2px;
+    padding: 2px 5px;
+    border-radius: 6px;
     display: inline-block;
+    font-family: "M PLUS Rounded 1c", sans-serif; /* 如果有圓體會更好睇，無就用預設 */
 }
 
-/* 讀岩 (綠色) */
 .diff-correct { 
     color: #2d6a4f; 
-    background-color: rgba(45, 106, 79, 0.1); /* 淡淡的綠底 */
+    background-color: #d8f3dc; /* 綠底 */
 }
 
-/* 讀錯 (紅色 + 刪除線) */
 .diff-wrong { 
-    color: #d00000; 
-    text-decoration: line-through;
-    margin-right: 5px; /* 同正確字分開少少 */
+    color: #e63946; 
+    text-decoration: none; /* 去除刪除線，改用顏色區分 */
+    background-color: #ffe5d9; /* 紅底 */
+    border-bottom: 3px solid #e63946; /* 紅色底線 */
 }
 
-/* 漏讀 (灰色) */
 .diff-missed { 
     color: #adb5bd; 
-    border-bottom: 2px dashed #adb5bd;
+    border: 2px dashed #dee2e6; /* 虛線框框住漏咗嘅字 */
 }
-
-/* ========================================= */
-/* 👆👆👆 貼上結束 👆👆👆 */
-/* ========================================= */
     </style>
 </head>
 <body>
