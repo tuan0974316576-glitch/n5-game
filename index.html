@@ -3348,7 +3348,13 @@ const vocabList = [
     // =========================================================
     // 2. 核心功能 Function
     // =========================================================
-
+function replayAudio() {
+        // 確保遊戲隊列中有題目
+        if (gameQueue && gameQueue.length > 0 && gameQueue[currentIndex]) {
+            // 讀出當前題目的假名 (kana)
+            speakJapanese(gameQueue[currentIndex].kana);
+        }
+    }
     function toggleMic() {
         if (!recognition) { alert("瀏覽器不支援"); return; }
         if (isListening) {
