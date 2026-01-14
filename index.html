@@ -3510,7 +3510,7 @@ function loadQuestion() {
             document.querySelector('.score-display').textContent = `Score: ${correctCount}`;
         }
 
-let currentTargetText = ""; // 用來存貯當前要讀的例句
+let currentTargetText = ""; 
 
 function showFeedback(isCorrect, q) {
     const div = document.getElementById('feedback');
@@ -3518,25 +3518,25 @@ function showFeedback(isCorrect, q) {
     const status = isCorrect ? '正解！' : '殘念...';
     
     let exampleHtml = '';
-    let cleanJpText = ''; // 純日文文字 (無 HTML)
+    let cleanJpText = '';
 
     if (q.example) {
-        // 1. 提取純文字例句 (去除 HTML 標籤)
         cleanJpText = getCleanJpText(q.example);
-        // 2. 存入全域變數，給錄音功能用
-        currentTargetText = cleanJpText;
+        currentTargetText = cleanJpText; 
 
-        // 轉義單引號，防止發音按鈕出錯
         const safeText = cleanJpText.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         
         exampleHtml = `
             <div class="example-box">
-                <div class="ex-label" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>例句發音練習：</span>
-                    <button onclick="speakJapanese('${safeText}')" style="border:none; background:none; cursor:pointer;" title="聽老師讀">🔊</button>
+                <div class="ex-label" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px;">
+                    <div style="display:flex; align-items:center;">
+                        <span>例句：</span>
+                        <button onclick="speakJapanese('${safeText}')" style="border:none; background:none; cursor:pointer;" title="聽老師讀">🔊</button>
+                    </div>
+                    <button id="ai-trigger-btn" class="ai-btn" onclick="askAI('${q.kanji || q.kana}', '${safeText}')">🤖 問問Master Joe</button>
                 </div>
                 
-                <div style="margin:5px 0; font-size:18px;">${q.example}</div>
+                <div style="margin:8px 0; font-size:18px;">${q.example}</div>
 
                 <div id="sentence-mic-area" style="margin-top:10px; border-top:1px dashed #ccc; padding-top:10px; text-align:center;">
                     <button id="mic-btn" class="mic-btn" onclick="toggleMic()" style="margin:0 auto;">
@@ -3544,18 +3544,8 @@ function showFeedback(isCorrect, q) {
                     </button>
                     <div id="mic-feedback" class="mic-result" style="margin-top:5px;"></div>
                 </div>
+
                 <div id="ai-loading-text" class="ai-loading">AI 思考中...</div>
-                <div id="ai-explanation-box" class="ai-box"></div>
-            </div>
-        `;
-                    
-<button id="ai-trigger-btn" class="ai-btn" onclick="askAI('${q.kanji || q.kana}', '${safeText}')">🤖 問問Master Joe🤖</button>
-
-                </div>
-                
-                <div style="margin-top:5px;">${q.example}</div>
-
-                <div id="ai-loading-text" class="ai-loading">幫緊你...幫緊你...</div>
                 <div id="ai-explanation-box" class="ai-box"></div>
             </div>
         `;
@@ -3572,9 +3562,8 @@ function showFeedback(isCorrect, q) {
         </div>
     `;
 
-    // 自動播放例句讀音 (可選)
     if (cleanJpText) {
-        setTimeout(() => { speakJapanese(cleanJpText); }, 500); 
+        setTimeout(() => { speakJapanese(cleanJpText); }, 600); 
     }
 }
         function nextQuestion() {
@@ -3753,9 +3742,10 @@ let recognition;
 let isListening = false;
 
 // 1. 初始化語音辨識 (個腦)
+// ✅ 乾淨版語音設定 (請取代原本檔案最底那個 if 區塊)
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
-    recognition.lang = 'ja-JP'; // 設定聽日文
+    recognition.lang = 'ja-JP';
     recognition.continuous = false;
     recognition.interimResults = false;
 
@@ -3765,9 +3755,7 @@ if (SpeechRecognition) {
         document.getElementById('mic-feedback').innerHTML = '...';
     };
 
-recognition.onend = function() {
-        // 唔好直接 set isListening = false，因為有時係短暫斷開
-        // 這裡我們只做簡單狀態重置
+    recognition.onend = function() {
         isListening = false;
         updateMicUI('跟讀這句 (評分)', false);
     };
@@ -3775,28 +3763,23 @@ recognition.onend = function() {
     recognition.onresult = function(event) {
         const spokenText = event.results[0][0].transcript;
         console.log("聽到:", spokenText);
-        checkPronunciation(spokenText); // 收到聲音後，去檢查分數
+        checkPronunciation(spokenText); 
     };
     
-recognition.onerror = function(event) {
+    recognition.onerror = function(event) {
         console.log("Mic Error:", event.error);
         isListening = false;
         updateMicUI('跟讀這句 (評分)', false);
         
         let errorMsg = '沒聽到聲音，請再試一次';
-        
-        // 針對唔同錯誤比唔同提示
         if (event.error === 'not-allowed') {
             errorMsg = '❌ 麥克風被鎖，請在網址列允許權限';
         } else if (event.error === 'no-speech') {
-            errorMsg = '🔇 沒聽到聲音 (請點擊後立即說話)';
-        } else if (event.error === 'network') {
-            errorMsg = '⚠️ 網絡不穩，無法辨識';
+            errorMsg = '🔇 沒聽到聲音';
         }
         
         document.getElementById('mic-feedback').innerHTML = `<span style="color:#c92a2a; font-size:13px;">${errorMsg}</span>`;
     };
-    // 👆👆👆 結束 👆👆👆
 }
 
 // 2. 開關麥克風功能
