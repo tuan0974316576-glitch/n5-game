@@ -3760,6 +3760,7 @@ function replayAudio() {
     });
 
     function startGame(retryMode = false) {
+        cuteSfx.start();
         // 安全檢查：確保 vocabList 存在
         if (typeof vocabList === 'undefined' || !vocabList || vocabList.length === 0) {
             alert("錯誤：找不到 vocabList (詞彙庫)。請檢查代碼中是否已填入單字。");
@@ -4156,28 +4157,154 @@ function speakJapanese(text, onEndCallback = null) {
         }
     }
 
-    // 音效
+   // =========================================================
+    // 🎵 新・日系可愛音效系統 (Cute SFX)
+    // =========================================================
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    function playTone(freq, type, duration) {
-        if (!audioContext) return;
-        try {
+
+    const cuteSfx = {
+        // 基礎發聲函數
+        playTone: (freq, type, duration, vol = 0.1) => {
+            if (audioContext.state === 'suspended') audioContext.resume();
             const osc = audioContext.createOscillator();
             const gain = audioContext.createGain();
             osc.connect(gain);
             gain.connect(audioContext.destination);
             osc.type = type;
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+            osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+            gain.gain.setValueAtTime(0, audioContext.currentTime);
+            gain.gain.linearRampToValueAtTime(vol, audioContext.currentTime + 0.01);
             gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
             osc.start();
             osc.stop(audioContext.currentTime + duration);
-        } catch(e) {}
-    }
-    const sfx = {
-        click: () => playTone(600, 'triangle', 0.05),
-        correct: () => { playTone(880, 'sine', 0.1); setTimeout(() => playTone(1760, 'sine', 0.2), 100); },
-        wrong: () => playTone(150, 'sawtooth', 0.3),
+        },
+
+        // 🔘 點擊聲 (Bubble Pop)：像水滴一樣 "波!"
+        click: () => {
+            if (audioContext.state === 'suspended') audioContext.resume();
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.type = 'sine'; 
+            osc.frequency.setValueAtTime(800, audioContext.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioContext.currentTime + 0.1);
+        },
+
+        // 🖱️ 滑鼠滑過 (Tick)：極短輕快的 "的"
+        hover: () => {
+            if (audioContext.state === 'suspended') audioContext.resume();
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(1200, audioContext.currentTime);
+            gain.gain.setValueAtTime(0.05, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.03);
+            osc.start();
+            osc.stop(audioContext.currentTime + 0.03);
+        },
+
+        // ✅ 答對 (Chime)：清脆的 "叮-龍!" 
+        correct: () => {
+            if (audioContext.state === 'suspended') audioContext.resume();
+            cuteSfx.playTone(880, 'sine', 0.4, 0.2); // A5
+            setTimeout(() => cuteSfx.playTone(1108, 'sine', 0.6, 0.2), 100); // C#6
+            setTimeout(() => cuteSfx.playTone(1760, 'sine', 0.3, 0.05), 150); // A6
+        },
+
+        // ❌ 答錯 (Bubu)：可愛的 "布布..."
+        wrong: () => {
+            if (audioContext.state === 'suspended') audioContext.resume();
+            cuteSfx.playTone(150, 'triangle', 0.15, 0.2); 
+            setTimeout(() => cuteSfx.playTone(130, 'triangle', 0.3, 0.2), 150);
+        },
+
+        // 🎮 遊戲開始 (Let's Go)：登登登！(上行音階)
+        start: () => {
+            if (audioContext.state === 'suspended') audioContext.resume();
+            // C -> E -> G (大三和弦)
+            const now = audioContext.currentTime;
+            setTimeout(() => cuteSfx.playTone(523.25, 'sine', 0.1, 0.2), 0);   
+            setTimeout(() => cuteSfx.playTone(659.25, 'sine', 0.1, 0.2), 100); 
+            setTimeout(() => cuteSfx.playTone(783.99, 'sine', 0.4, 0.2), 200); 
+        }
     };
+
+    // 兼容舊代碼名稱
+    const sfx = {
+        click: cuteSfx.click,
+        correct: cuteSfx.correct,
+        wrong: cuteSfx.wrong
+    };
+
+    // 🔥 自動綁定音效 (這段就係解決你困擾既部分) 🔥
+    // 佢會自動搵頁面所有按鈕，幫佢地加上 "滑過" 同 "點擊" 聲音
+    (function initAutoSound() {
+        const attachSounds = () => {
+            // 選擇所有按鈕、選項、Slider
+            const targets = document.querySelectorAll('button, .option-btn, input[type="range"]');
+            
+            targets.forEach(el => {
+                // 如果已經加過聲音，就跳過 (防止重複)
+                if (el.dataset.soundReady) return;
+                el.dataset.soundReady = "true";
+
+                // 加滑鼠滑過聲
+                el.addEventListener('mouseenter', () => {
+                   if (!el.disabled) cuteSfx.hover();
+                });
+
+                // 加點擊聲 (mousedown 比 click 更快有反應)
+                el.addEventListener('mousedown', () => {
+                   if (!el.disabled) cuteSfx.click();
+                });
+            });
+        };
+
+        // 1. 網頁一載入，即刻做一次
+        attachSounds();
+
+        // 2. 監聽網頁變化 (防止之後生出黎既按鈕冇聲)
+        const observer = new MutationObserver(attachSounds);
+        observer.observe(document.body, { childList: true, subtree: true });
+    })();
+
+    // 為了兼容舊代碼，將舊的 sfx 指向新的 cuteSfx
+const sfx = {
+        click: cuteSfx.click,
+        correct: cuteSfx.correct,
+        wrong: cuteSfx.wrong
+    };
+
+    // 🔥 自動綁定音效 (這段就係解決你困擾既部分) 🔥
+    // 佢會自動搵頁面所有按鈕，幫佢地加上 "滑過" 同 "點擊" 聲音
+    (function initAutoSound() {
+        const attachSounds = () => {
+            // 選擇所有按鈕、選項、Slider
+            const targets = document.querySelectorAll('button, .option-btn, input[type="range"]');
+            
+            targets.forEach(el => {
+                // 如果已經加過聲音，就跳過 (防止重複)
+                if (el.dataset.soundReady) return;
+                el.dataset.soundReady = "true";
+
+                // 加滑鼠滑過聲
+                el.addEventListener('mouseenter', () => {
+                   if (!el.disabled) cuteSfx.hover();
+                });
+
+                // 加點擊聲 (mousedown 比 click 更快有反應)
+                el.addEventListener('mousedown', () => {
+                   if (!el.disabled) cuteSfx.click();
+                });
+            });
+        };
 
     // 溫習模式
     const reviewCategories = [
