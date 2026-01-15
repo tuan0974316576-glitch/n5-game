@@ -4148,7 +4148,9 @@ function speakJapanese(text, onEndCallback = null) {
             let formattedText = aiText.replace(/### (.*?)\n/g, '<h4 style="margin:10px 0 5px; color:#6f42c1;">$1</h4>');
             formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             formattedText = formattedText.replace(/^\* /gm, '• ');
-            if(box) { box.innerHTML = formattedText; box.style.display = 'block'; }
+            if(box) { 
+                await typeWriter(box, formattedText, 20);
+            }
         } catch (error) {
             if(box) { box.innerHTML = `<span style="color:red;">哎呀，AI 連線錯誤。<br>詳細：${error.message}</span>`; box.style.display = 'block'; }
         } finally {
@@ -4350,7 +4352,58 @@ correct: () => {
             setTimeout(() => { speakJapanese(cleanEx); }, 1200); 
         }
     }
+// =========================================================
+    // 🤖 打字機特效函數 (處理 HTML 版)
+    // =========================================================
+    async function typeWriter(element, htmlContent, speed = 30) {
+        element.innerHTML = '';
+        element.style.display = 'block';
+        
+        // 1. 將 HTML 字串轉做真正的 DOM 節點
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        const nodes = Array.from(tempDiv.childNodes);
 
+        // 2. 遞歸函數：負責逐層打印
+        async function typeNode(node, parent) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                // 如果係文字，就逐個字加落去
+                const text = node.textContent;
+                const textNode = document.createTextNode('');
+                parent.appendChild(textNode);
+                
+                for (let i = 0; i < text.length; i++) {
+                    textNode.textContent += text[i];
+                    
+                    // 自動捲動到底部 (費事打打下睇唔到)
+                    const container = document.getElementById('review-screen'); 
+                    if(container) container.scrollTop = container.scrollHeight;
+
+                    // 控制打字速度
+                    await new Promise(r => setTimeout(r, speed));
+                }
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                // 如果係標籤 (e.g. <h4>, <strong>)，直接建立元素
+                const el = document.createElement(node.tagName);
+                // 複製原本嘅 style/class
+                Array.from(node.attributes).forEach(attr => {
+                    el.setAttribute(attr.name, attr.value);
+                });
+                parent.appendChild(el);
+                
+                // 繼續處理裡面嘅子內容
+                const children = Array.from(node.childNodes);
+                for (const child of children) {
+                    await typeNode(child, el);
+                }
+            }
+        }
+
+        // 3. 開始執行
+        for (const node of nodes) {
+            await typeNode(node, element);
+        }
+    }
 </script>
 </body>
 </html>
