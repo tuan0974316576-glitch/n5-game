@@ -4180,19 +4180,25 @@ function speakJapanese(text, onEndCallback = null) {
         },
 
         // 🔘 點擊聲 (Bubble Pop)：像水滴一樣 "波!"
-        click: () => {
+click: () => {
             if (audioContext.state === 'suspended') audioContext.resume();
             const osc = audioContext.createOscillator();
             const gain = audioContext.createGain();
             osc.connect(gain);
             gain.connect(audioContext.destination);
-            osc.type = 'sine'; 
-            osc.frequency.setValueAtTime(800, audioContext.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.1);
-            gain.gain.setValueAtTime(0.2, audioContext.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            // 用 triangle 波形，聲底厚實啲，似實體按鍵
+            osc.type = 'triangle'; 
+            
+            // 固定頻率 (唔好變調)，短促有力
+            osc.frequency.setValueAtTime(600, audioContext.currentTime);
+            
+            // 音量：極快咁收細 (0.05秒內)，造成「篤」一聲
+            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
+            
             osc.start();
-            osc.stop(audioContext.currentTime + 0.1);
+            osc.stop(audioContext.currentTime + 0.05);
         },
 
         // 🖱️ 滑鼠滑過 (Tick)：極短輕快的 "的"
@@ -4211,18 +4217,19 @@ function speakJapanese(text, onEndCallback = null) {
         },
 
         // ✅ 答對 (Chime)：清脆的 "叮-龍!" 
-        correct: () => {
+correct: () => {
             if (audioContext.state === 'suspended') audioContext.resume();
-            cuteSfx.playTone(880, 'sine', 0.4, 0.2); // A5
-            setTimeout(() => cuteSfx.playTone(1108, 'sine', 0.6, 0.2), 100); // C#6
-            setTimeout(() => cuteSfx.playTone(1760, 'sine', 0.3, 0.05), 150); // A6
+            // 快速連播三個音 (C -> E -> G)，形成一種 "叮!" 嘅感覺
+            cuteSfx.playTone(1046.50, 'triangle', 0.3, 0.1); // C6
+            setTimeout(() => cuteSfx.playTone(1318.51, 'triangle', 0.3, 0.1), 50); // E6
+            setTimeout(() => cuteSfx.playTone(1567.98, 'sine', 0.6, 0.1), 100); // G6
         },
 
         // ❌ 答錯 (Bubu)：可愛的 "布布..."
         wrong: () => {
             if (audioContext.state === 'suspended') audioContext.resume();
-            cuteSfx.playTone(150, 'triangle', 0.15, 0.2); 
-            setTimeout(() => cuteSfx.playTone(130, 'triangle', 0.3, 0.2), 150);
+            cuteSfx.playTone(150, 'triangle', 0.15, 0.8); 
+            setTimeout(() => cuteSfx.playTone(130, 'triangle', 0.3, 0.8), 150);
         },
 
         // 🎮 遊戲開始 (Let's Go)：登登登！(上行音階)
@@ -4236,15 +4243,24 @@ function speakJapanese(text, onEndCallback = null) {
         }
     };
 
-    // 兼容舊代碼名稱
+
+
+
+
+
+
+// ==========================================
+    // 👇 貼在 cuteSfx }; 的後面
+    // ==========================================
+
+    // 1. 兼容舊代碼 (將舊 sfx 指向新系統)
     const sfx = {
         click: cuteSfx.click,
         correct: cuteSfx.correct,
         wrong: cuteSfx.wrong
     };
 
-    // 🔥 自動綁定音效 (這段就係解決你困擾既部分) 🔥
-    // 佢會自動搵頁面所有按鈕，幫佢地加上 "滑過" 同 "點擊" 聲音
+    // 2. 自動綁定音效 (修復後的完整版)
     (function initAutoSound() {
         const attachSounds = () => {
             // 選擇所有按鈕、選項、Slider
@@ -4260,51 +4276,21 @@ function speakJapanese(text, onEndCallback = null) {
                    if (!el.disabled) cuteSfx.hover();
                 });
 
-                // 加點擊聲 (mousedown 比 click 更快有反應)
+                // 加點擊聲
                 el.addEventListener('mousedown', () => {
                    if (!el.disabled) cuteSfx.click();
                 });
             });
         };
 
-        // 1. 網頁一載入，即刻做一次
+        // 網頁一載入，即刻做一次
         attachSounds();
 
-        // 2. 監聽網頁變化 (防止之後生出黎既按鈕冇聲)
+        // 監聽網頁變化 (防止之後生出黎既按鈕冇聲)
         const observer = new MutationObserver(attachSounds);
         observer.observe(document.body, { childList: true, subtree: true });
     })();
 
-    // 為了兼容舊代碼，將舊的 sfx 指向新的 cuteSfx
-const sfx = {
-        click: cuteSfx.click,
-        correct: cuteSfx.correct,
-        wrong: cuteSfx.wrong
-    };
-
-    // 🔥 自動綁定音效 (這段就係解決你困擾既部分) 🔥
-    // 佢會自動搵頁面所有按鈕，幫佢地加上 "滑過" 同 "點擊" 聲音
-    (function initAutoSound() {
-        const attachSounds = () => {
-            // 選擇所有按鈕、選項、Slider
-            const targets = document.querySelectorAll('button, .option-btn, input[type="range"]');
-            
-            targets.forEach(el => {
-                // 如果已經加過聲音，就跳過 (防止重複)
-                if (el.dataset.soundReady) return;
-                el.dataset.soundReady = "true";
-
-                // 加滑鼠滑過聲
-                el.addEventListener('mouseenter', () => {
-                   if (!el.disabled) cuteSfx.hover();
-                });
-
-                // 加點擊聲 (mousedown 比 click 更快有反應)
-                el.addEventListener('mousedown', () => {
-                   if (!el.disabled) cuteSfx.click();
-                });
-            });
-        };
 
     // 溫習模式
     const reviewCategories = [
