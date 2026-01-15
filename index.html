@@ -5,20 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🎌N5詞彙大挑戰🎌</title>
     <style>
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Zen+Maru+Gothic:wght@500;700&display=swap');
         /* --- CSS 樣式 (保持不變) --- */
-        :root {
-            --base-bg: #F1F3F3;       
-            --primary-color: #0a9396;   
-            --primary-dark: #005f73;    
-            --secondary-color: #ee9b00; 
-            --secondary-dark: #ca6702;  
-            --light-bg-1: #e6eaea;      
-            --light-bg-2: #fff3e0;      
-            --text-color: #212529;      
-            --border-color: #ced4da;     
-            --danger-color: #dc3545;     
-            --correct-color: #2d6a4f;
-        }
+:root {
+    /* --- 🎨 新・日系文具配色 --- */
+    --base-bg: #fdfbf7;        /* 背景轉做米白色，比起純白更護眼、更有紙質感 */
+    
+    /* 主色：改用較為粉嫩的「波子汽水藍」 */
+    --primary-color: #4ecdc4;  
+    --primary-dark: #2cb5ac;   /* 深色版用黎做文字/邊框 */
+    
+    /* 副色：改用柔和的「芒果黃」 */
+    --secondary-color: #ffe66d; 
+    --secondary-dark: #ffb703;
+    
+    /* 狀態色：全部轉 Pastel Tone */
+    --danger-color: #ff6b6b;   /* 柔和紅 */
+    --correct-color: #6bf178;  /* 柔和綠 */
+    
+    --text-color: #444444;     /* 字體唔用純黑，用深灰 */
+    --border-color: #d1d8e0;   /* 淺灰邊框 */
+    --light-bg-1: #ffffff;      
+    --light-bg-2: #fffdf5;      
+}
 
 html, body {
     min-height: 100%; /* 改成 min-height */
@@ -28,7 +37,7 @@ html, body {
 }
 
         body {
-            font-family: "Hiragino Kaku Gothic ProN", "Meiryo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         font-family: "M PLUS Rounded 1c", "Zen Maru Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
             background-color: var(--base-bg); 
             color: var(--text-color);
             display: flex;
@@ -40,21 +49,19 @@ html, body {
     width: 100%;
     max-width: 850px;
     background-color: #ffffff;
-    border-radius: 12px;
-    border: 2px solid var(--border-color);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    padding: 24px 32px;
+   border: 3px dashed var(--primary-color); /* 邊框加粗到 5px，並改用主色 */
+    border-radius: 30px; /* 圓角加大，更有貼紙感 */
+box-shadow: 
+        0 0 0 6px #ffffff, 
+        0 10px 20px rgba(78, 205, 196, 0.15);
+padding: 24px 32px;
     box-sizing: border-box;
     position: relative;
-    
-    /* 關鍵修改：不再鎖死高度，改為自動 */
-    min-height: 600px;  /* 保持最小高度，以免內容太少時很醜 */
-    height: auto;       /* 讓它隨內容長大 */
-    margin: 20px auto;  /* 上下留點空間，置中 */
-    
+    min-height: 600px;
+    height: auto;
+    margin: 30px auto; /* 上下留多啲位俾陰影 */
     display: flex;
     flex-direction: column;
-    /* 刪除 overflow: hidden */
 }
 
         h1 {
@@ -96,48 +103,63 @@ html, body {
             margin-bottom: 10px;
         }
 
-        .option-btn {
-            background-color: #f8f9fa;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px;
-            cursor: pointer;
-            text-align: center;
-            font-weight: bold;
-            color: var(--text-color);
-            transition: all 0.2s;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
+.option-btn {
+    background-color: #ffffff;
+    /* 👇 轉做淺灰虛線，未選中時似未填色 */
+    border: 2px dashed #d1d8e0; 
+    border-radius: 50px; /* 變藥丸形狀 */
+    padding: 12px 10px;  /* 調整 Padding */
+    cursor: pointer;
+    text-align: center;
+    font-weight: bold;
+    color: #888;
+    transition: all 0.2s;
+    
+    /* 👇 加少少立體感 */
+    box-shadow: 0 4px 0 #f0f0f0; 
+    margin-bottom: 5px; /* 預留位俾按下效果 */
+}
 
-        .option-btn:hover {
-            border-color: var(--primary-color);
-            background-color: var(--light-bg-1);
-        }
+/* Hover 效果 */
+.option-btn:hover {
+    background-color: #e0fbfc;
+    border-color: var(--primary-color);
+    color: var(--primary-dark);
+    transform: translateY(-2px);
+}
 
-        .option-btn.selected {
-            background-color: var(--primary-color) !important;
-            color: white !important;
-            border-color: var(--primary-dark) !important;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
+/* ✅ 選中狀態 (Selected) - 變成實色貼紙 */
+.option-btn.selected {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    border: 2px solid var(--primary-color) !important; /* 轉實線 */
+    box-shadow: 0 4px 0 var(--primary-dark) !important; /* 深色立體底 */
+    transform: translateY(-2px);
+}
+
+/* 按下時 (Active) */
+.option-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 transparent !important;
+}
 
         .option-btn input { display: none; }
 
         /* Slider Styles */
-        .slider-container {
-            width: 100%;
-            margin: 15px 0;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            box-sizing: border-box;
-        }
+ .slider-container {
+    background: #ffffff !important;
+    
+    /* 👇 改用虛線 + 圓角 */
+    border: 2px dashed #d1d8e0 !important; 
+    border-radius: 20px !important;
+    
+    /* 👇 加少少立體感 */
+    box-shadow: 0 4px 0 #f0f0f0 !important;
+    padding: 15px 20px !important;
+    margin: 20px 0 !important;
+width: 100%; 
+    box-sizing: border-box;
+}
         
         .slider-label {
             font-size: 16px;
@@ -148,40 +170,86 @@ html, body {
             justify-content: space-between;
         }
 
-        input[type=range] {
-            width: 100%;
-            margin: 10px 0;
-            cursor: pointer;
-            accent-color: var(--primary-color);
-        }
+/* 移除預設樣式 */
+input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    margin: 15px 0;
+    background: transparent;
+}
 
-        .start-btn {
-            padding: 15px 50px;
-            font-size: 20px;
-            font-weight: bold;
-            color: white;
-            background-color: var(--secondary-dark);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-top: 20px;
-            margin-bottom: 15px;
-            flex-shrink: 0;
-        }
+/* --- 滑動軌道 (Track) --- */
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 12px;
+    cursor: pointer;
+    background: #e9ecef; /* 淺灰底 */
+    border-radius: 10px;
+    border: 2px dashed #ced4da; /* 虛線邊框軌道 */
+}
 
-        .start-btn:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
-        }
+/* --- 滑動圓點 (Thumb) --- */
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 28px;
+    width: 28px;
+    border-radius: 50%;
+    background: var(--primary-color); /* 主色圓點 */
+    cursor: pointer;
+    margin-top: -10px; /* 調整垂直位置 */
+    
+    /* 令圓點似粒糖 */
+    border: 3px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+    .start-btn {
+    width: 80%; /* 唔好太闊，留返啲邊 */
+    padding: 15px 0;
+    font-size: 22px;
+    font-weight: 900;
+    color: #5d4037; /* 深啡字，配黃底最靚 */
+    
+    background-color: var(--secondary-color); /* 芒果黃 */
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    
+    /* 👇 強烈立體感 */
+    box-shadow: 
+        0 6px 0 var(--secondary-dark), /* 厚厚嘅深黃底 */
+        0 10px 10px rgba(255, 193, 7, 0.3);
         
-        .start-btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+    transition: all 0.1s;
+    margin: 30px auto;
+    display: block; /* 置中 */
+}
+
+.start-btn:hover {
+    background-color: #ffeb85;
+    transform: translateY(-2px);
+    box-shadow: 
+        0 8px 0 var(--secondary-dark),
+        0 15px 15px rgba(255, 193, 7, 0.4);
+}
+
+.start-btn:active {
+    transform: translateY(6px); /* 按到底 */
+    box-shadow: 0 0 0 var(--secondary-dark);
+}
+
+.start-btn:disabled {
+    background-color: #e9ecef;
+    color: #adb5bd;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+}
 
         /* --- 遊戲區域 --- */
         #game-area {
@@ -224,28 +292,36 @@ html, body {
         .timer-warning #timer-bar { background-color: var(--danger-color); }
 
         /* 問題顯示區 (平假名 + 發音) */
-        #question-display {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background-color: var(--light-bg-1);
-            border-radius: 12px;
-            margin-bottom: 20px;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 4px solid var(--border-color);
-            position: relative;
-        }
+#question-display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    /* 👇 關鍵修改 👇 */
+    background-color: #ffffff;          /* 1. 改成白色底，不再是灰色 */
+    border: 4px dashed var(--primary-color); /* 2. 四邊都用粗虛線，不用 solid */
+    border-radius: 25px;                /* 3. 圓角加大，更可愛 */
+    box-shadow: 0 6px 0 rgba(10, 147, 150, 0.2); /* 4. 加個厚陰影，令佢浮起似貼紙 */
+    
+    /* 👇 版面調整 */
+    margin-bottom: 25px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    /* 刪除了舊的 border-bottom */
+}
 
-        .jp-word {
-            font-size: 42px; 
-            font-weight: bold;
-            color: var(--text-color);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-        }
+/* 順便改埋字體顏色，配合返 */
+.jp-word {
+    font-size: 48px; /* 字體再大少少 */
+    font-weight: 900; /* 極粗體 */
+    color: var(--primary-dark); /* 用深色主調，對比更清晰 */
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 0px #e0fbfc; /* 加少少可愛的字體陰影 */
+}
 
         .jp-hint {
             font-size: 18px;
@@ -290,8 +366,10 @@ html, body {
 
         .answer-choice-btn {
             background-color: white;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
+            border: 3px dashed var(--border-color);
+            border-radius: 50px;
+box-shadow: 0 4px 0 #e9ecef;
+transform: translateY(0);
             padding: 15px;
             font-size: 18px;
             cursor: pointer;
@@ -304,22 +382,26 @@ html, body {
             min-height: 60px;
         }
 
-        .answer-choice-btn:hover:not(:disabled) {
-            border-color: var(--primary-color);
-            background-color: var(--light-bg-2);
-        }
+.answer-choice-btn:hover:not(:disabled) {
+    border-color: var(--primary-color);
+    background-color: #e0fbfc; /* 淺藍色 */
+    color: var(--primary-dark);
+    transform: translateY(-2px); /* 浮起效果 */
+    box-shadow: 0 6px 0 #bde0e1; /* 陰影加深 */
+}
 
-        .answer-choice-btn.correct {
-            background-color: var(--correct-color);
-            color: white;
-            border-color: var(--correct-color);
-        }
+.answer-choice-btn:active {
+    transform: translateY(2px); /* 沉落去 */
+    box-shadow: 0 0 0 #bde0e1; /* 陰影消失 */
+}
 
-        .answer-choice-btn.wrong {
-            background-color: var(--danger-color);
-            color: white;
-            border-color: var(--danger-color);
-        }
+.answer-choice-btn.wrong {
+    background-color: #ffe3e3;       /* 淺粉紅底 (原本是深紅) */
+    border: 3px dashed #fa5252;      /* 深紅色虛線框 */
+    color: #c92a2a;                  /* 深紅色字 */
+    box-shadow: none;
+    transform: translateY(2px);
+}
 
         .answer-choice-btn:disabled {
             cursor: default;
@@ -333,14 +415,24 @@ html, body {
             margin-bottom: 10px;
         }
         .feedback-box {
-            padding: 10px;
-            border-radius: 6px;
+            padding: 15px;
+            border-radius: 15px;
             background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            animation: fadeIn 0.3s ease;
-        }
-        .feedback-correct .feedback-status { color: var(--correct-color); font-weight: bold; font-size: 1.1em; }
-        .feedback-incorrect .feedback-status { color: var(--danger-color); font-weight: bold; font-size: 1.1em; }
+box-shadow: 0 4px 0 rgba(0,0,0,0.05); /* 微微浮起 */
+    animation: fadeIn 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.feedback-correct { 
+    border-color: var(--correct-color); 
+    background-color: #e8f5e9; /* 轉淺綠色底 */
+    color: var(--correct-color);
+}
+.feedback-incorrect { 
+    border-color: var(--danger-color); 
+    background-color: #ffebee; /* 轉淺粉紅底 */
+    color: var(--danger-color);
+}
         
         .kanji-reveal {
             font-size: 28px;
@@ -356,39 +448,67 @@ html, body {
         }
 
         /* 控制按鈕 */
-        #controls {
-            display: flex;
-            justify-content: space-between; 
-            align-items: center;
-            height: 50px; 
-            flex-shrink: 0;
-        }
+#controls {
+    display: flex;
+    justify-content: center; /* 放中間 */
+    gap: 20px; /* 按鈕之間要有距離 */
+    align-items: center;
+    margin-top: 20px; /* 同上面隔開 */
+    padding-top: 20px;
+    border-top: 2px dashed #f0f0f0; /* 加條好淺嘅分隔線 */
+    flex-shrink: 0;
+}
 
-        #game-menu-btn {
-            padding: 10px 25px;
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--primary-color);
-            cursor: pointer;
-            border-radius: 8px; 
-            border: 2px solid var(--primary-color);
-            background-color: white;
-        }
+#game-menu-btn {
+    padding: 10px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #aaa; /* 平時由佢淺色啲，唔好搶鏡 */
+    background-color: white;
+    border: 2px solid #eee;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#game-menu-btn:hover {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+    background-color: #fff5f5;
+    transform: translateY(-2px);
+}
         
-        #next-btn {
-            padding: 10px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            border-radius: 8px; 
-            border: none;
-            background-color: var(--primary-color); 
-            margin-left: auto;
-            display: none; /* 初始隱藏 */
-        }
+#next-btn {
+    padding: 12px 45px;
+    font-size: 18px;
+    font-weight: 900;
+    color: white;
+    cursor: pointer;
+    border: none;
+    border-radius: 50px;
+    background-color: var(--primary-color);
+    
+    /* 雙層陰影：造出立體同發光感 */
+    box-shadow: 
+        0 4px 0 var(--primary-dark),
+        0 8px 10px rgba(78, 205, 196, 0.3);
+        
+    transition: all 0.1s;
+    margin-left: 0; /* 唔好用 auto 推去最右，改用 flex center 排列 */
+    display: none; /* 初始隱藏 */
+}
 
-        #next-btn:hover { background-color: var(--primary-dark); }
+#next-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 6px 0 var(--primary-dark),
+        0 12px 15px rgba(78, 205, 196, 0.4);
+}
+
+#next-btn:active {
+    transform: translateY(4px); /* 按落去 */
+    box-shadow: 0 0 0 var(--primary-dark);
+}
 
         /* --- 結束畫面 --- */
         #end-screen-container {
@@ -399,37 +519,87 @@ html, body {
         }
 /* --- AI 解說專用樣式 --- */
 .ai-btn {
-    background-color: #6f42c1; /* 紫色系代表 AI */
-    color: white;
+    /* 👇 改用黃色系漸變 (由淺黃到深黃)，配合 --secondary-color */
+    background: linear-gradient(135deg, #ffe66d 0%, #ffc107 100%);
+    color: #5d4037; /* 字體改用深啡色，對比黃色底會清楚啲，又柔和過黑色 */
+    
     border: none;
-    border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 13px;
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: 14px;
+    font-weight: 800;
     cursor: pointer;
     margin-left: 10px;
+    
+    /* 👇 白色邊框 + 黃色光暈 */
+    border: 3px solid #ffffff; 
+    box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+    
     transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
-.ai-btn:hover { background-color: #5a32a3; }
-.ai-btn:disabled { background-color: #ccc; cursor: wait; }
+
+.ai-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(255, 193, 7, 0.5);
+}
+
+.ai-btn:disabled {
+    background: #e0e0e0;
+    color: #999;
+    border-color: #f0f0f0;
+    box-shadow: none;
+    cursor: wait;
+}
 
 .ai-box {
-    margin-top: 10px;
-    padding: 12px;
-    background-color: #f3e5f5; /* 淺紫色背景 */
-    border-radius: 8px;
-    border-left: 4px solid #6f42c1;
-    font-size: 14px;
-    line-height: 1.6;
-    color: #333;
-    display: none; /* 預設隱藏 */
-    white-space: pre-wrap; /* 保留換行 */
+    margin-top: 15px;
+    padding: 15px 20px;
+    
+    /* 👇 淡紫色背景 + 深紫虛線框 */
+    background-color: #f3e5f5; 
+    border: 3px dashed #d1c4e9; 
+    border-radius: 15px;       /* 圓角 */
+    
+    /* 👇 字體設定 */
+    font-size: 15px;
+    line-height: 1.7;
+    color: #5e35b1;            /* 深紫色字，易讀又夾色 */
+    
+    display: none;             /* 預設隱藏 */
+    white-space: pre-wrap;     
+    position: relative;        /* 方便定位 */
+    
+    /* 👇 小陰影 */
+    box-shadow: 0 4px 0 rgba(0,0,0,0.05);
+}
+
+/* 加個可愛嘅標題裝飾 (如果你想有的話) */
+.ai-box::before {
+    content: "💡 Master Joe 提示：";
+    display: block;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: #7e57c2;
+    font-size: 13px;
 }
 .ai-loading {
-    color: #6f42c1;
-    font-weight: bold;
-    font-size: 13px;
+    color: #9575cd;
+    font-weight: 800;
+    font-size: 14px;
     display: none;
-    margin-top: 5px;
+    margin-top: 10px;
+    text-align: center;
+    
+    /* 呼吸燈動畫 */
+    animation: blink 1.5s infinite both;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.95); }
 }
         .end-game-container {
             display: flex;
@@ -442,17 +612,24 @@ html, body {
             box-sizing: border-box;
         }
 
-        .final-score {
-            font-size: 32px; 
-            font-weight: 900;
-            color: var(--secondary-dark);
-            margin: 10px 0; 
-            border: 3px solid var(--secondary-color);
-            padding: 15px;
-            border-radius: 8px;
-            background-color: var(--light-bg-2);
-            flex-shrink: 0; 
-        }
+.final-score {
+    font-size: 32px; 
+    font-weight: 900;
+    
+    /* 👇 改用芒果黃底色 + 深啡字 */
+    color: #5d4037; 
+    background-color: var(--secondary-color);
+    
+    /* 👇 貼紙風格：白邊 + 陰影 */
+    border: 4px solid #ffffff; 
+    border-radius: 25px;
+    box-shadow: 0 6px 15px rgba(255, 193, 7, 0.3);
+    
+    margin: 20px 0; 
+    padding: 20px 40px;
+    flex-shrink: 0; 
+    text-align: center;
+}
 
         .error-analysis {
             flex: 1;
@@ -465,17 +642,31 @@ html, body {
             box-sizing: border-box;
         }
 
-        .error-item {
-            margin-bottom: 10px;
-            padding: 10px;
-            border-left: 4px solid var(--danger-color);
-            background-color: #fff5f5;
-            border-radius: 4px;
-            font-size: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.error-item {
+    /* 👇 卡片化：白底 + 圓角 + 粉紅虛線 */
+    background-color: #ffffff;
+    border: 2px dashed #ffc9c9; /* 淺粉紅虛線 */
+    border-left: none; /* 移除舊嘅粗邊 */
+    border-radius: 15px;
+    
+    margin-bottom: 12px;
+    padding: 15px 20px;
+    
+    /* 👇 令佢立體少少 */
+    box-shadow: 0 4px 0 #fff0f0; 
+    
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+/* 如果想 Mouse 指埋去會郁下 */
+.error-item:hover {
+    transform: scale(1.02);
+    border-color: var(--danger-color);
+}
 
         .end-controls {
             display: flex;
@@ -487,28 +678,73 @@ html, body {
             padding-bottom: 20px;
         }
         
-        .end-btn {
-            padding: 12px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 8px;
-            border: 2px solid transparent;
-        }
+/* 共用設定：變圓、變粗體 */
+.end-btn {
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    border-radius: 50px; /* 藥丸形 */
+    border: none;
+    transition: all 0.2s;
+    margin: 0 5px; /* 按鈕之間留啲位 */
+}
 
-        #end-menu-btn { background-color: white; color: var(--primary-color); border-color: var(--primary-color); }
-        #end-retry-btn { background-color: #e9c46a; color: #333; border-color: #d4a373; }
-        #end-reselect-btn { background-color: var(--secondary-dark); color: white; border-color: var(--secondary-dark); }
+/* 1. 返回選單 (白底 + 灰框) */
+#end-menu-btn {
+    background-color: white;
+    color: #888;
+    border: 2px solid #eee;
+    box-shadow: 0 4px 0 #e0e0e0;
+}
+#end-menu-btn:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+    color: #555;
+}
+
+/* 2. 重測錯題 (粉紅色 - 強調錯誤) */
+#end-retry-btn {
+    background-color: #ffecc7; /* 淺橙色 */
+    color: #d97706;
+    border: 2px dashed #d97706;
+    box-shadow: 0 4px 0 #ffdeb3;
+}
+#end-retry-btn:hover {
+    background-color: #ffd8a8;
+    transform: translateY(-2px);
+}
+
+/* 3. 再來一局 (主色/黃色 - 鼓勵繼續) */
+#end-reselect-btn {
+    background-color: var(--secondary-color); /* 芒果黃 */
+    color: #5d4037;
+    border: none; /* 唔要邊框 */
+    box-shadow: 
+        0 4px 0 var(--secondary-dark),
+        0 8px 10px rgba(255, 193, 7, 0.3);
+}
+#end-reselect-btn:hover {
+    transform: translateY(-2px);
+    background-color: #ffeb85;
+}
+
+/* 按下效果 */
+.end-btn:active {
+    transform: translateY(2px);
+    box-shadow: none !important;
+}
 /* --- 新增：例句顯示樣式 --- */
 .example-box {
     margin-top: 10px;
     padding: 10px;
     background-color: #fff8e1; /* 淺黃色背景 */
-    border-radius: 6px;
-    border: 1px dashed var(--secondary-color);
+    border-radius: 12px;
+    border: 3px dashed var(--secondary-color);
     text-align: left;
     font-size: 15px;
     line-height: 1.5;
+position: relative;
 }
 .ex-label {
     font-weight: bold;
@@ -617,7 +853,7 @@ html, body {
 /* 2. 按鈕基本形態 (日系粗框虛線) */
 .mic-btn {
     background-color: #ffffff;
-    border: 3px dashed #0a9396; /* 粗虛線邊框 (主色) */
+    border: 4px dashed #0a9396; /* 粗虛線邊框 (主色) */
     border-radius: 50px;        /* 超圓潤 */
     padding: 12px 35px;         /* 加大按鈕，手指好撳啲 */
     font-size: 18px;            /* 字體加大 */
@@ -629,7 +865,7 @@ html, body {
     justify-content: center;
     gap: 12px;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* 彈性動畫 */
-    box-shadow: 0 5px 15px rgba(10, 147, 150, 0.15); /* 輕微陰影令佢浮起 */
+    box-shadow: 0 4px 0 rgba(10, 147, 150, 0.2);
     outline: none;
     min-width: 220px; /* 固定最少闊度，唔會郁黎郁去 */
 }
@@ -642,6 +878,10 @@ html, body {
     border-color: #ccc;     /* 邊框變灰 */
     color: #999;            /* 字體變灰 */
     pointer-events: none;   /* 禁止點擊 (雙重保險) */
+}
+.mic-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 rgba(10, 147, 150, 0.2); 
 }
 /* 滑鼠指住時 */
 .mic-btn:hover {
@@ -691,6 +931,66 @@ html, body {
 .diff-missed { 
     color: #adb5bd; 
     border: 2px dashed #dee2e6; /* 虛線框框住漏咗嘅字 */
+}
+/* =========================================
+   👇 請補上這段遺漏的代碼 (修復切邊 + 美化按鈕)
+   ========================================= */
+
+/* 1. 修復列表被切邊 & 出現橫向 Scroll Bar 問題 */
+.error-analysis, #review-list {
+    padding: 15px !important; 
+    box-sizing: border-box;
+    overflow-x: hidden !important; 
+    width: 100%;
+}
+
+.error-item, .review-item {
+    /* 確保卡片左右有少少空間，放大時唔會俾邊框切走 */
+    margin: 0 2px 12px 2px !important; 
+    width: auto !important; 
+}
+
+
+#selection-screen button.option-btn[onclick*="location"] {
+    background-color: #ffffff !important;
+    
+    /* 👇 重點修改：改用灰色虛線，配合整體貼紙風 */
+    border: 2px dashed #ced4da !important; 
+    
+    border-radius: 50px !important;
+    color: #6c757d !important; /* 字體用深灰，清楚易讀 */
+    font-weight: 900 !important;
+    
+    /* 👇 統一立體陰影 */
+    box-shadow: 0 4px 0 #dee2e6 !important; 
+}
+
+#selection-screen button.option-btn[onclick*="location"]:hover {
+    transform: translateY(-2px);
+    background-color: #f1f3f5 !important; /* Hover 時變微灰底 */
+    border-color: #adb5bd !important;      /* 邊框加深 */
+    color: #495057 !important;
+}
+
+/* 右邊：溫習詞彙表 (淺藍虛線框) */
+#selection-screen button.option-btn[onclick*="Review"] {
+    background-color: #e0fbfc !important;
+    border: 2px dashed var(--primary-color) !important;
+    border-radius: 50px !important;
+    color: var(--primary-dark) !important;
+    font-weight: 900 !important;
+    box-shadow: 0 4px 0 #bde0e1 !important;
+}
+#selection-screen button.option-btn[onclick*="Review"]:hover {
+    transform: translateY(-2px);
+    background-color: #c5f6fa !important;
+}
+
+/* 按下效果 */
+#selection-screen button.option-btn[onclick*="location"]:active,
+#selection-screen button.option-btn[onclick*="Review"]:active {
+    transform: translateY(2px);
+    box-shadow: none !important;
 }
     </style>
 </head>
